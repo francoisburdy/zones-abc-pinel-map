@@ -39,7 +39,7 @@ createApp({
       });
       this.map
         .addControl(new mapboxgl.AttributionControl({
-          customAttribution: 'par François Burdy &bull; <a href="https://github.com/francoisburdy" target="_blank" rel="noreferrer">GitHub</a>',
+          customAttribution: 'par François Burdy &bull; <a href="https://github.com/francoisburdy/zones-abc-pinel-map" target="_blank" rel="noreferrer">GitHub</a>',
           //compact: true,
         }))
         .addControl(new mapboxgl.FullscreenControl({
