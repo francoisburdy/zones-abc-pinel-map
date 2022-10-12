@@ -20,9 +20,11 @@ createApp({
       intervalSearch: null,
       chosenAddress: null,
       showAboutBox: true,
+      timing: 0,
     }
   },
   mounted() {
+    this.timing = performance.now();
     this.initMap();
   },
   methods: {
@@ -52,6 +54,7 @@ createApp({
           this.map.setFog({});
         })
         .on('load', () => {
+          console.log('load in ', (performance.now() - this.timing) + 'ms');
           const legend = document.getElementById('legend');
           for (key in this.legendItems) {
             const item = document.createElement('div');
@@ -68,6 +71,8 @@ createApp({
           this.map.addSource('communes', {
             type: 'geojson',
             data: './data/dist/georef-communes-with-zones.geojson',
+            buffer: 0,
+            tolerance: 0.5,
           });
           this.map.addLayer(this.communeLayer);
         })
@@ -79,6 +84,9 @@ createApp({
         })
         .on('mouseleave', 'communes-layer', () => {
           this.map.getCanvas().style.cursor = '';
+        })
+        .on('idle', () => {
+          console.log('idle in ', (performance.now() - this.timing) + 'ms');
         });
     },
 
