@@ -16,6 +16,7 @@
 </head>
 <body>
 <div id="app">
+  <div id="circle-loader" v-if="showLoader"></div>
   <div id='map'></div>
   <div class="map-overlay" id="top-left-container">
     <div id='about-box' v-if="showAboutBox">

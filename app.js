@@ -21,6 +21,7 @@ createApp({
       chosenAddress: null,
       showAboutBox: true,
       timing: 0,
+      showLoader: true,
     }
   },
   mounted() {
@@ -86,6 +87,7 @@ createApp({
           this.map.getCanvas().style.cursor = '';
         })
         .on('idle', () => {
+          this.showLoader = false;
           console.log('idle in ', (performance.now() - this.timing) + 'ms');
         });
     },

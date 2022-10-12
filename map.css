@@ -49,22 +49,23 @@ p {
 
 #about-box .close-btn {
     position: absolute;
-    top: 13px;
-    right: 3px;
-    width: 22px;
-    height: 22px;
-    line-height: 20px;
+    top: 14px;
+    right: 5px;
+    width: 28px;
+    height: 28px;
+    line-height: 24px;
     border-radius: 50%;
     padding: 0;
-    font-size: 16px;
-    border: 2px solid rgb(0 0 0 / 30%);
+    font-size: 18px;
+    border: 2px solid rgb(0 0 0 / 45%);
     color: rgb(0 0 0 / 60%);
+    background-color: rgb(0 0 0 / 3%);
     cursor: pointer;
     font-weight: bold;
 }
 
 #about-box .close-btn:hover {
-    background-color: rgb(0 0 0 / 10%)
+    background-color: rgb(0 0 0 / 12%)
 }
 
 #search-box {
@@ -157,4 +158,42 @@ p {
 .search-result:focus, .search-result:hover {
     background-color: #eaeaea;
     cursor: pointer;
+}
+
+
+#circle-loader {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 50px;
+    width: 50px;
+    margin: -25px 0 0 -25px;
+    border: 4px rgba(0, 0, 0, 0.25) solid;
+    border-top: 4px black solid;
+    border-radius: 50%;
+    -webkit-animation: spin2 1s infinite linear;
+    animation: spin2 1s infinite linear;
+    z-index: 3;
+}
+
+@-webkit-keyframes spin2 {
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes spin2 {
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
 }
