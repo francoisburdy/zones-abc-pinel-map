@@ -6,11 +6,11 @@ createApp({
   data() {
     return {
       legendItems: {
-        'Abis': { 'text': 'Zone A bis', 'color': '#cd00b2' },
-        'A': { 'text': 'Zone A', 'color': '#f10000' },
-        'B1': { 'text': 'Zone B1', 'color': '#ff9900' },
-        'B2': { 'text': 'Zone B2', 'color': '#b2ec00' },
-        'C': { 'text': 'Zone C', 'color': 'transparent' },
+        'Abis': { 'text': 'Zone A bis', 'color': '#9800e7', 'hoverColor': '#8300c4' },
+        'A': { 'text': 'Zone A', 'color': '#f10000', 'hoverColor': '#d00000' },
+        'B1': { 'text': 'Zone B1', 'color': '#ffa600', 'hoverColor': '#d48b00' },
+        'B2': { 'text': 'Zone B2', 'color': '#abe300', 'hoverColor': '#96c700' },
+        'C': { 'text': 'Zone C', 'color': 'transparent', 'hoverColor': '#ccc' },
       },
       searchQuery: "",
       isTyping: false,
@@ -22,6 +22,7 @@ createApp({
       showAboutBox: true,
       timing: 0,
       showLoader: true,
+      hoveredCommuneId: null,
     }
   },
   mounted() {
@@ -54,40 +55,69 @@ createApp({
         })
         .on('load', () => {
           console.log('load in ', (performance.now() - this.timing) + 'ms');
-          const legend = document.getElementById('legend');
-          for (key in this.legendItems) {
-            const item = document.createElement('div');
-            const round = document.createElement('span');
-            round.className = 'legend-key';
-            round.style.backgroundColor = this.legendItems[key].color;
-
-            const value = document.createElement('span');
-            value.innerHTML = `${this.legendItems[key].text}`;
-            item.appendChild(round);
-            item.appendChild(value);
-            legend.appendChild(item);
-          }
+          this.makeLegend();
           this.map.addSource('communes', {
             type: 'geojson',
             data: './data/dist/georef-communes-with-zones.geojson',
             buffer: 0,
-            tolerance: 0.5,
+            tolerance: 0.45,
+            generateId: true,
           });
           this.map.addLayer(this.communeLayer);
         })
         .on('click', 'communes-layer', (e) => {
           this.showMarker(e.lngLat, e.features[0]);
         })
+        .on('mousemove', 'communes-layer', (e) => {
+          if (e.features.length > 0) {
+            if (this.hoveredCommuneId !== null) {
+              this.map.setFeatureState(
+                { source: 'communes', id: this.hoveredCommuneId },
+                { hover: false }
+              );
+            }
+            this.hoveredCommuneId = e.features[0].id;
+            this.map.setFeatureState(
+              { source: 'communes', id: this.hoveredCommuneId },
+              { hover: true }
+            );
+          }
+        })
         .on('mouseenter', 'communes-layer', () => {
           this.map.getCanvas().style.cursor = 'pointer';
         })
         .on('mouseleave', 'communes-layer', () => {
           this.map.getCanvas().style.cursor = '';
+          if (this.hoveredCommuneId !== null) {
+            this.map.setFeatureState(
+              { source: 'communes', id: this.hoveredCommuneId },
+              { hover: false }
+            );
+          }
+          this.hoveredCommuneId = null;
         })
         .on('idle', () => {
-          this.showLoader = false;
-          console.log('idle in ', (performance.now() - this.timing) + 'ms');
+          if (this.showLoader) {
+            console.log('idle in ', (performance.now() - this.timing) + 'ms');
+            this.showLoader = false;
+          }
         });
+    },
+
+    makeLegend() {
+      const legend = document.getElementById('legend');
+      for (key in this.legendItems) {
+        const item = document.createElement('div');
+        const round = document.createElement('span');
+        round.className = 'legend-key';
+        round.style.backgroundColor = this.legendItems[key].color;
+
+        const value = document.createElement('span');
+        value.innerHTML = `${this.legendItems[key].text}`;
+        item.appendChild(round);
+        item.appendChild(value);
+        legend.appendChild(item);
+      }
     },
 
     showMarker(lnglat, feature) {
@@ -108,7 +138,7 @@ createApp({
       clearInterval(this.intervalSearch);
       this.intervalSearch = setTimeout(() => {
         this.search();
-      }, 400)
+      }, 350)
     },
 
     search() {
@@ -121,6 +151,10 @@ createApp({
             this.isLoading = false;
             this.searchResults = response.data.features;
             this.hasSearchResults();
+          })
+          .catch(thrown => {
+            this.isLoading = false;
+            console.error(thrown);
           });
       } else {
         this.searchResults = [];
@@ -147,7 +181,7 @@ createApp({
       let coordinates = this.chosenAddress.geometry.coordinates;
       this.map.flyTo({
         center: [coordinates[0], coordinates[1]],
-        zoom: 10,
+        zoom: 9.7,
         essential: true,
       });
       this.map.once('moveend', () => {
@@ -163,20 +197,47 @@ createApp({
         'id': 'communes-layer',
         'type': 'fill',
         'source': 'communes',
+        'layout': {},
         'paint': {
           'fill-color': [
             'match', ['get', 'zone'],
-            'Abis', this.legendItems.Abis.color,
-            'A', this.legendItems.A.color,
-            'B1', this.legendItems.B1.color,
-            'B2', this.legendItems.B2.color,
-            this.legendItems.C.color
+            'Abis', [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              this.legendItems.Abis.hoverColor,
+              this.legendItems.Abis.color,
+            ],
+            'A', [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              this.legendItems.A.hoverColor,
+              this.legendItems.A.color,
+            ],
+            'B1', [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              this.legendItems.B1.hoverColor,
+              this.legendItems.B1.color,
+            ],
+            'B2', [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              this.legendItems.B2.hoverColor,
+              this.legendItems.B2.color,
+            ],
+            [
+              'case',
+              ['boolean', ['feature-state', 'hover'], false],
+              this.legendItems.C.hoverColor,
+              this.legendItems.C.color,
+            ]
           ],
-          'fill-opacity': 0.7,
+          'fill-opacity': 0.68,
           'fill-outline-color':
             [
               'match', ['get', 'zone'],
-              'C', "rgba(0, 0, 0, 10%)",
+              'C',
+              "rgba(0, 0, 0, 10%)",
               "rgba(0, 0, 0, 20%)"
             ],
 
