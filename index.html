@@ -25,29 +25,26 @@
       <p>
         Zonage de classification des communes en fonction du déséquilibre entre l'offre et la demande de logement.
         <strong>Le zonage ABC est utilisé pour les barèmes locatifs (notament dispositifs Pinel, Denormandie, PTZ et
-          logements
-          PLS)</strong>
+          logements PLS)</strong>
       </p>
       <p>
         Sources de données
         <a href="https://www.data.gouv.fr/fr/datasets/liste-des-zones-ptz-et-pinel-1/" target="_blank" rel="noreferrer">data.gouv.fr</a>
         et
-        <a
-          href="https://public.opendatasoft.com/explore/dataset/georef-france-commune/information/?disjunctive.reg_name&disjunctive.dep_name&disjunctive.arrdep_name&disjunctive.ze2020_name&disjunctive.bv2012_name&disjunctive.epci_name&disjunctive.ept_name&disjunctive.com_name&disjunctive.ze2010_name&disjunctive.com_is_mountain_area">
-          opendatasoft</a>.
+        <a href="https://public.opendatasoft.com/explore/dataset/georef-france-commune">opendatasoft</a>.
       </p>
       <p>
         <a target="_blank" rel="noreferrer"
-           href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000038970859/">Art. D304-1</a> code de la
-        construction et de l'habitation.
-        Plus d'infos <a href="https://www.ecologie.gouv.fr/zonage-b-c" target="_blank" rel="noreferrer">Ministère de la
-        transition écologique</a>.
+           href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000038970859/">Art. D304-1</a>
+        code de la construction et de l'habitation.
+        Plus d'infos
+        <a href="https://www.ecologie.gouv.fr/zonage-b-c" target="_blank"
+           rel="noreferrer">Ministère de la transition écologique</a>.
       </p>
-      <p>Visualisation par François BURDY &bull; <a
-        href="https://github.com/francoisburdy/zones-abc-pinel-map">Github</a> &bull; Licence
-        Libre.</p>
       <p>
-
+        Visualisation par François BURDY &bull;
+        <a href="https://github.com/francoisburdy/zones-abc-pinel-map">Github</a>
+        &bull; Licence Libre.
       </p>
     </div>
     <div id="search-box">
@@ -61,7 +58,10 @@
                @keyup.esc="clearSearch()"
                type="text"
                placeholder="Commune, code postal...">
-        <button v-show="searchQuery.length" @click="clearSearch()" type="button" class="clear-btn">&times;</button>
+        <button v-show="searchQuery.length" @click="clearSearch()"
+                type="button" class="clear-btn" title="Effacer">
+          &times;
+        </button>
       </div>
       <div v-if="hasResults && searchResults" class="search-result-container">
         <div v-for="(feature, index) in searchResults">
@@ -76,7 +76,7 @@
           </div>
         </div>
       </div>
-      <template v-if="!isTyping && !isLoading && !hasResults && querySearch">
+      <template v-if="!isTyping && !isLoading && !hasResults && searchQuery">
         <div class="search-result">
           <div>Aucun résultat</div>
         </div>

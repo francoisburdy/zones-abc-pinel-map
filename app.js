@@ -30,7 +30,6 @@ createApp({
   },
   methods: {
     initMap() {
-
       this.map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
@@ -43,7 +42,6 @@ createApp({
       this.map
         .addControl(new mapboxgl.AttributionControl({
           customAttribution: 'par François Burdy &bull; <a href="https://github.com/francoisburdy/zones-abc-pinel-map" target="_blank" rel="noreferrer">GitHub</a>',
-          //compact: true,
         }))
         .addControl(new mapboxgl.FullscreenControl({
           container: document.querySelector('body')
