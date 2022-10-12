@@ -6,14 +6,11 @@
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
   <meta name="description"
         content="Carte de France des zones tendues par commune, pour l'investissement locatif Pinel et PTZ. Zones A bis, A, B1, B2 et C">
-  <meta name="google-site-verification" content="OGRhhKNogMg9cUvNmX_cU4Ejt04oORs2LDK4L_m9Hmo" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"
-          integrity="sha512-bHeT+z+n8rh9CKrSrbyfbINxu7gsBmSHlDCb3gUF1BjmjDzKhoKspyB71k0CIRBSjE5IVQiMMVBgCWjF60qsvA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://unpkg.com/vue@3.2.40/dist/vue.global.js"></script>
+  <link rel="preconnect" href="https://api.mapbox.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet">
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
   <link href="map.css" rel="stylesheet">
+  <meta name="google-site-verification" content="OGRhhKNogMg9cUvNmX_cU4Ejt04oORs2LDK4L_m9Hmo"/>
 </head>
 <body>
 <div id="app">
@@ -22,9 +19,9 @@
   <div class="map-overlay" id="top-left-container">
     <div id='about-box' v-if="showAboutBox">
       <button class="close-btn" title="Fermer" @click="showAboutBox = false">&times;</button>
-      <h1>Zones tendues ABC par commune</h1>
+      <h1>Cartes des zones Pinel A bis, A, B1, B2 et C</h1>
       <p>
-        Zonage de classification des communes en fonction du déséquilibre entre l'offre et la demande de logement.
+        Zonage ABC de classification des communes en fonction du déséquilibre entre l'offre et la demande de logement.
         <strong>Le zonage ABC est utilisé pour les barèmes locatifs (notament dispositifs Pinel, Denormandie, PTZ et
           logements PLS)</strong>
       </p>
@@ -88,6 +85,9 @@
 
   <div class='map-overlay' id='legend'></div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.40/vue.global.min.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

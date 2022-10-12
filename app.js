@@ -91,13 +91,14 @@ createApp({
     },
 
     showMarker(lnglat, feature) {
+      const props = feature.properties;
       new mapboxgl.Popup()
         .setLngLat(lnglat)
         .setHTML(
-          `<strong>${feature.properties.com_name}</strong><br/>
-               ${feature.properties.dep_name} (${feature.properties.dep_code})<br/>
-               Zone ${feature.properties.zonePinel}<br/>
-               Code INSEE ${feature.properties.com_code}`
+          `<strong>${props.com_name}</strong><br/>
+           ${props.dep_name} (${props.dep_code})<br/>
+           <span class="zone-badge zone-${props.zone.toLowerCase()}">Zone ${props.zone}</span><br/>
+           Code INSEE ${props.com_code}`
         )
         .addTo(this.map);
     },
@@ -105,16 +106,17 @@ createApp({
     setTyping() {
       this.isTyping = true;
       clearInterval(this.intervalSearch);
-      this.intervalSearch = setTimeout(function() {
+      this.intervalSearch = setTimeout(() => {
         this.search();
-      }.bind(this), 400)
+      }, 400)
     },
+
     search() {
       console.log('search...', this.searchQuery)
       this.isTyping = false
       if (this.searchQuery.length >= 3) {
         this.isLoading = true;
-        axios.get(`https://api-adresse.data.gouv.fr/search/?limit=8&type=municipality&q=${this.searchQuery}`)
+        axios.get(`https://api-adresse.data.gouv.fr/search/?limit=6&type=municipality&q=${this.searchQuery}`)
           .then(response => {
             this.isLoading = false;
             this.searchResults = response.data.features;
@@ -148,7 +150,6 @@ createApp({
         zoom: 10,
         essential: true,
       });
-
       this.map.once('moveend', () => {
         let center = this.map.getCenter();
         this.map.fire('click', { lngLat: center, point: this.map.project(center) })
@@ -164,7 +165,7 @@ createApp({
         'source': 'communes',
         'paint': {
           'fill-color': [
-            'match', ['get', 'zonePinel'],
+            'match', ['get', 'zone'],
             'Abis', this.legendItems.Abis.color,
             'A', this.legendItems.A.color,
             'B1', this.legendItems.B1.color,
@@ -174,7 +175,7 @@ createApp({
           'fill-opacity': 0.7,
           'fill-outline-color':
             [
-              'match', ['get', 'zonePinel'],
+              'match', ['get', 'zone'],
               'C', "rgba(0, 0, 0, 10%)",
               "rgba(0, 0, 0, 20%)"
             ],

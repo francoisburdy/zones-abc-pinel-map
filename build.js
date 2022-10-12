@@ -18,13 +18,13 @@ const originalFilesize = JSON.stringify(featureCollection).length;
 for (const feature of featureCollection.features) {
   const zone = parsedZones[feature.properties.com_code]
   if (zone) {
-    feature.properties.zonePinel = zone.zone
+    feature.properties.zone = zone.zone
     countFound++
   }
 
   // keep only useful properties to reduce file size
   feature.properties = {
-    zonePinel: feature.properties.zonePinel,
+    zone: feature.properties.zone,
     dep_name: feature.properties.dep_name,
     dep_code: feature.properties.dep_code,
     com_code: feature.properties.com_code,
