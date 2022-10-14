@@ -21,7 +21,7 @@ const mapConfig = {
 
 const mapSourceConfig = {
   type: 'geojson',
-  data: dataFiles.dest,
+  data: dataFiles.destLight,
   buffer: 0,
   tolerance: 0.45,
   generateId: true,
