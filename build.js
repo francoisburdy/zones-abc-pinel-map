@@ -1,15 +1,12 @@
-var fs = require('fs')
+import { mkdir, readFile, writeFile } from 'fs/promises';
+import { dataFiles } from './vars.js'
 
-const zoneMapFile = './data/Zonage_abc_communes_2022-index.json'
-const sourceFile = './data/georef-france-commune-simplified-geojson.json'
-const destFile = './data/dist/georef-communes-with-zones.geojson'
 
-let featureCollection = require(sourceFile)
-console.log(`Commune Geojson file ${sourceFile} loaded`)
-console.log(featureCollection.features.length, 'features to be enriched')
+let featureCollection = JSON.parse(await readFile(dataFiles.original, "utf8"))
+console.log(`Commune Geojson file ${dataFiles.original} loaded`)
 
-let parsedZones = require(zoneMapFile)
-console.log(`Zone mapping file ${zoneMapFile} loaded`)
+let parsedZones = JSON.parse(await readFile(dataFiles.zoneMapping, "utf8"))
+console.log(`Zone mapping file ${dataFiles.zoneMapping} loaded`)
 
 let countFound = 0
 
@@ -24,15 +21,15 @@ for (const feature of featureCollection.features) {
 
   // keep only useful properties to reduce file size
   feature.properties = {
-    zone: feature.properties.zone,
-    dep_name: feature.properties.dep_name,
-    dep_code: feature.properties.dep_code,
-    com_code: feature.properties.com_code,
-    com_name: feature.properties.com_name,
+    z: feature.properties.zone,
+    dn: feature.properties.dep_name,
+    dc: feature.properties.dep_code,
+    cc: feature.properties.com_code,
+    cn: feature.properties.com_name,
   }
 
   // reduce coordinates precision to a maximum of 6 decimals
-  const precision = 1e5;
+  const precision = 1e3;
   if (feature.geometry && feature.geometry.type === 'Polygon' && feature.geometry.coordinates && feature.geometry.coordinates.length && feature.geometry.coordinates[0].length) {
     for (const coordinatesPair of feature.geometry.coordinates[0]) {
       coordinatesPair[0] = Math.round((coordinatesPair[0] + Number.EPSILON) * precision) / precision;
@@ -49,11 +46,22 @@ for (const feature of featureCollection.features) {
 
 }
 
-console.log(`${countFound} features enriched; ${featureCollection.features.length - countFound} not found;`)
+console.log(countFound, `features enriched\t`, featureCollection.features.length - countFound, `not found`)
+
+const filteredFeatureCollection = JSON.parse(JSON.stringify(featureCollection));
+filteredFeatureCollection.features = filteredFeatureCollection.features.filter(function(feature) {
+  return feature.properties.z !== 'C'
+});
 
 const finalFilesize = JSON.stringify(featureCollection).length;
-console.log('Original file size: ', originalFilesize / 1e6, 'Optimized file size:', finalFilesize / 1e6);
+const filteredFileSize = JSON.stringify(filteredFeatureCollection).length;
 
-fs.writeFileSync(destFile, JSON.stringify(featureCollection), 'utf8')
+await mkdir('./dist/data', { recursive: true })
+await writeFile(`./dist/${dataFiles.dest}`, JSON.stringify(featureCollection), 'utf8')
+await writeFile(`./dist/${dataFiles.destLight}`, JSON.stringify(filteredFeatureCollection), 'utf8')
 
-console.log(`Persisted to destination file: ${destFile}\nBye!`)
+console.log(`\nOriginal file:\t${originalFilesize / 1e6} Mo\t${dataFiles.original}`)
+console.log(`Optimized file:\t${finalFilesize / 1e6} Mo\tdist/${dataFiles.dest}`)
+console.log(`Filtered file:\t${filteredFileSize / 1e6} Mo\tdist/${dataFiles.destLight}`)
+
+console.log('\nBye!')

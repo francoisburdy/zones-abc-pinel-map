@@ -7,16 +7,14 @@
   <meta name="description"
         content="Carte de France des zones tendues par commune, pour l'investissement locatif Pinel et PTZ. Zones A bis, A, B1, B2 et C"/>
   <link rel="preconnect" href="https://api.mapbox.com"/>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com"/>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet"/>
-  <link href="map.css" rel="stylesheet"/>
+  <link href="app.css" rel="stylesheet"/>
   <link rel="shortcut icon" href="favicon.png" type="image/png"/>
   <meta name="google-site-verification" content="OGRhhKNogMg9cUvNmX_cU4Ejt04oORs2LDK4L_m9Hmo"/>
 </head>
 <body>
 <div id="app">
   <div id="circle-loader" v-if="showLoader"></div>
-  <div id='map'></div>
+  <div id="map"></div>
   <div class="map-overlay" id="top-left-container">
     <div id='about-box' v-if="showAboutBox">
       <button class="close-btn" title="Fermer" @click="showAboutBox = false">&times;</button>
@@ -86,9 +84,6 @@
 
   <div class='map-overlay' id='legend'></div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.2/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.40/vue.global.min.js"></script>
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,31 @@
+{
+  "name": "zones-abc-pinel-map",
+  "description": "Carte de visualisation des zones Pinel A bis, A, B1, B2, et C",
+  "author": "François Burdy",
+  "keywords": [
+    "zones ABC",
+    "Loi Pinel"
+  ],
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "prod": "webpack --mode=production",
+    "watch": "webpack --watch --mode=development",
+    "watch-prod": "webpack --watch --mode=production",
+    "prepare": "rm -r ./dist/* && node build && yarn prod"
+  },
+  "dependencies": {
+    "axios": "^1.1.2",
+    "mapbox-gl": "^2.10.0",
+    "vue": "^3.2.38"
+  },
+  "devDependencies": {
+    "file-loader": "^6.2.0",
+    "sass": "^1.55.0",
+    "sass-loader": "^13.1.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
+}
