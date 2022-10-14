@@ -7,6 +7,10 @@
   <meta name="description"
         content="Carte de France des zones tendues par commune, pour l'investissement locatif Pinel et PTZ. Zones A bis, A, B1, B2 et C"/>
   <link rel="preconnect" href="https://api.mapbox.com"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <link href="app.css" rel="stylesheet"/>
   <link rel="shortcut icon" href="favicon.png" type="image/png"/>
   <meta name="google-site-verification" content="OGRhhKNogMg9cUvNmX_cU4Ejt04oORs2LDK4L_m9Hmo"/>
@@ -15,9 +19,49 @@
 <div id="app">
   <div id="circle-loader" v-if="showLoader"></div>
   <div id="map"></div>
-  <div class="map-overlay" id="top-left-container">
+  <div class="map-overlay" id="top-left-container" v-cloak>
+    <div id="search-box">
+      <div class="search-input-container">
+        <div class="loupe">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <input class="search-input"
+               aria-label="Search"
+               v-model="searchQuery"
+               @input="setTyping()"
+               @focusin="setTyping()"
+               @compositionupdate="setTyping()"
+               @keyup.esc="clearSearch()"
+               type="text"
+               placeholder="Commune, code postal...">
+        <button v-show="searchQuery.length" @click="clearSearch()"
+                type="button" class="clear-btn" title="Effacer">
+          &times;
+        </button>
+      </div>
+      <div v-if="hasResults && searchResults" class="search-result-container">
+        <div v-for="(feature, index) in searchResults">
+          <div @click="chosenAddress = feature; addressChange()"
+               @keyup.enter="chosenAddress = feature; addressChange()"
+               @keyup.space="chosenAddress = feature; addressChange()"
+               tabindex="0"
+               title="Choisir cette commune"
+               class="search-result">
+            <div><strong>{{ feature.properties.label }}</strong></div>
+            <div>{{ feature.properties.context }}</div>
+          </div>
+        </div>
+      </div>
+      <div v-if="!isTyping && !isLoading && !hasResults && searchQuery" class="search-result-container">
+        <div class="search-result-empty">
+          <div>Aucun résultat</div>
+        </div>
+      </div>
+    </div>
     <div id='about-box' v-if="showAboutBox">
-      <button class="close-btn" title="Fermer" @click="showAboutBox = false">&times;</button>
+      <button class="close-btn" title="Fermer" @click="showAboutBox = false">
+        <span class="material-icons-outlined">close</span>
+      </button>
       <h1>Cartes des zones Pinel A bis, A, B1, B2 et C</h1>
       <p>
         Zonage ABC de classification des communes en fonction du déséquilibre entre l'offre et la demande de logement.
@@ -43,46 +87,23 @@
         <a href="https://github.com/francoisburdy/zones-abc-pinel-map">Github</a>
         &bull; Licence Libre.
       </p>
+      <button @click="loadLayer">loadMap</button>
     </div>
-    <div id="search-box">
-      <div class="search-input-container">
-        <div class="loupe">&#128269;</div>
-        <input class="search-input"
-               aria-label="Search"
-               v-model="searchQuery"
-               @input="setTyping()"
-               @focusin="setTyping()"
-               @keyup.esc="clearSearch()"
-               type="text"
-               placeholder="Commune, code postal...">
-        <button v-show="searchQuery.length" @click="clearSearch()"
-                type="button" class="clear-btn" title="Effacer">
-          &times;
-        </button>
-      </div>
-      <div v-if="hasResults && searchResults" class="search-result-container">
-        <div v-for="(feature, index) in searchResults">
-          <div @click="chosenAddress = feature; addressChange()"
-               @keyup.enter="chosenAddress = feature; addressChange()"
-               @keyup.space="chosenAddress = feature; addressChange()"
-               tabindex="0"
-               title="Choisir cette commune"
-               class="search-result">
-            <div><strong>{{ feature.properties.label }}</strong></div>
-            <div>{{ feature.properties.context }}</div>
-          </div>
-        </div>
-      </div>
-      <template v-if="!isTyping && !isLoading && !hasResults && searchQuery">
-        <div class="search-result">
-          <div>Aucun résultat</div>
-        </div>
-      </template>
-    </div>
-
   </div>
 
-  <div class='map-overlay' id='legend'></div>
+  <div id="legend" class="map-overlay" v-cloak>
+    <div v-for="(legendItem, key) in legendItems">
+      <span class="legend-key" :style="`background-color:${legendItem.color}`"></span>
+      <span :class="key === 'C' && lightMode ? 'gray' : ''">{{ legendItem.text }}</span>
+      <button v-if="key === 'C'" class="switchLightMode"
+              :title="`${lightMode ? 'Afficher' : 'Masquer'} les contours des zones C`">
+        <span class="material-icons-outlined" @click="switchMode">
+          {{ lightMode ? 'visibility' : 'visibility_off' }}
+        </span>
+      </button>
+    </div>
+  </div>
+
 </div>
 <script src="app.js"></script>
 </body>
