@@ -1,11 +1,14 @@
-import { apiAdresseUrl, itemsColors, mapboxToken, mapConfig, mapSourceConfig } from "../vars.js"
-import mapboxgl from 'mapbox-gl';
+import { apiAdresseUrl, dataFiles, itemsColors, mapboxToken, mapConfig } from "../vars.js"
+import mapboxgl from 'mapbox-gl'
 import { createApp } from 'vue'
 import axios from 'axios'
 
 import '../favicon.png'
 
 mapboxgl.accessToken = mapboxToken;
+
+const layerId = 'communes-layer'
+const sourceId = 'communes'
 
 createApp({
   data() {
@@ -22,6 +25,7 @@ createApp({
       timing: 0,
       showLoader: true,
       hoveredCommuneId: null,
+      lightMode: true,
     }
   },
   mounted() {
@@ -36,21 +40,16 @@ createApp({
           customAttribution: `par François Burdy &bull; 
           <a href="https://github.com/francoisburdy/zones-abc-pinel-map" target="_blank" rel="noreferrer">GitHub</a>`,
         }))
+        .addControl(new mapboxgl.NavigationControl(), 'bottom-right')
         .addControl(new mapboxgl.FullscreenControl({
           container: document.querySelector('body')
-        }))
-        .addControl(new mapboxgl.NavigationControl(), 'bottom-right')
+        }), 'bottom-right')
       ;
       this.map
         .on('style.load', () => {
           this.map.setFog({});
         })
-        .on('load', () => {
-          console.log('load in ', (performance.now() - this.timing) + 'ms');
-          this.makeLegend();
-          this.map.addSource('communes', mapSourceConfig);
-          this.map.addLayer(this.communeLayer);
-        })
+        .on('load', this.loadFeatures)
         .on('click', 'communes-layer', (e) => {
           this.showMarker(e.lngLat, e.features[0]);
         })
@@ -90,20 +89,22 @@ createApp({
         });
     },
 
-    makeLegend() {
-      const legend = document.getElementById('legend');
-      for (const key in this.legendItems) {
-        const item = document.createElement('div');
-        const round = document.createElement('span');
-        round.className = 'legend-key';
-        round.style.backgroundColor = this.legendItems[key].color;
-
-        const value = document.createElement('span');
-        value.innerHTML = `${this.legendItems[key].text}`;
-        item.appendChild(round);
-        item.appendChild(value);
-        legend.appendChild(item);
+    loadFeatures() {
+      console.log('load in ', (performance.now() - this.timing) + 'ms');
+      if (this.map.getLayer('communes-layer')) {
+        this.map.removeLayer('communes-layer')
       }
+      if (this.map.getSource('communes')) {
+        this.map.removeSource('communes')
+      }
+      this.map.addSource('communes', {
+        type: 'geojson',
+        data: this.lightMode ? dataFiles.destLight : dataFiles.dest,
+        buffer: 0,
+        tolerance: 0.45,
+        generateId: true,
+      });
+      this.map.addLayer(this.communeLayer);
     },
 
     showMarker(lnglat, feature) {
@@ -119,7 +120,14 @@ createApp({
         .addTo(this.map);
     },
 
+    switchMode() {
+      this.showLoader = true
+      this.lightMode = !this.lightMode
+      this.loadFeatures()
+    },
+
     setTyping() {
+      this.showAboutBox = false
       this.isTyping = true;
       clearInterval(this.intervalSearch);
       this.intervalSearch = setTimeout(() => {
@@ -175,7 +183,6 @@ createApp({
         this.map.fire('click', { lngLat: center, point: this.map.project(center) })
       })
     },
-
   },
   computed: {
     communeLayer() {

@@ -19,7 +19,8 @@
   "dependencies": {
     "axios": "^1.1.2",
     "mapbox-gl": "^2.10.0",
-    "vue": "^3.2.38"
+    "vue": "^3.2.38",
+    "vue3-touch-events": "^4.1.0"
   },
   "devDependencies": {
     "file-loader": "^6.2.0",

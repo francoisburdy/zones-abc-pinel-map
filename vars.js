@@ -19,14 +19,6 @@ const mapConfig = {
   attributionControl: false,
 }
 
-const mapSourceConfig = {
-  type: 'geojson',
-  data: dataFiles.destLight,
-  buffer: 0,
-  tolerance: 0.45,
-  generateId: true,
-}
-
 const itemsColors = {
   'Abis': {
     'text': 'Zone A bis',
@@ -60,6 +52,5 @@ export {
   apiAdresseUrl,
   dataFiles,
   mapConfig,
-  mapSourceConfig,
   itemsColors,
 }
