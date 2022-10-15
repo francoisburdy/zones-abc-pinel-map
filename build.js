@@ -1,12 +1,18 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { dataFiles } from './vars.js'
 
+const log = console.log;
+
+const roundCoordinates = (latLng, precision = 1e3) => {
+  latLng[0] = Math.round((latLng[0] + Number.EPSILON) * precision) / precision
+  latLng[1] = Math.round((latLng[1] + Number.EPSILON) * precision) / precision
+}
 
 let featureCollection = JSON.parse(await readFile(dataFiles.original, "utf8"))
-console.log(`Commune Geojson file ${dataFiles.original} loaded`)
+log(`Commune Geojson file ${dataFiles.original} loaded`)
 
 let parsedZones = JSON.parse(await readFile(dataFiles.zoneMapping, "utf8"))
-console.log(`Zone mapping file ${dataFiles.zoneMapping} loaded`)
+log(`Zone mapping file ${dataFiles.zoneMapping} loaded`)
 
 let countFound = 0
 
@@ -28,40 +34,34 @@ for (const feature of featureCollection.features) {
     cn: feature.properties.com_name,
   }
 
-  // reduce coordinates precision to a maximum of 6 decimals
-  const precision = 1e3;
+  // reduce coordinates precision to a maximum of 10^-3
   if (feature.geometry && feature.geometry.type === 'Polygon' && feature.geometry.coordinates && feature.geometry.coordinates.length && feature.geometry.coordinates[0].length) {
-    for (const coordinatesPair of feature.geometry.coordinates[0]) {
-      coordinatesPair[0] = Math.round((coordinatesPair[0] + Number.EPSILON) * precision) / precision;
-      coordinatesPair[1] = Math.round((coordinatesPair[1] + Number.EPSILON) * precision) / precision;
+    for (const point of feature.geometry.coordinates[0]) {
+      roundCoordinates(point, 1e3)
     }
   } else if (feature.geometry && feature.geometry.type === 'MultiPolygon' && feature.geometry.coordinates && feature.geometry.coordinates.length) {
     for (const polygon of feature.geometry.coordinates) {
-      for (const coordinatesPair of polygon[0]) {
-        coordinatesPair[0] = Math.round((coordinatesPair[0] + Number.EPSILON) * precision) / precision;
-        coordinatesPair[1] = Math.round((coordinatesPair[1] + Number.EPSILON) * precision) / precision;
+      for (const point of polygon[0]) {
+        roundCoordinates(point, 1e3)
       }
     }
   }
-
 }
 
-console.log(countFound, `features enriched\t`, featureCollection.features.length - countFound, `not found`)
+log(countFound, `features enriched\t`, featureCollection.features.length - countFound, `not found`)
 
 const filteredFeatureCollection = JSON.parse(JSON.stringify(featureCollection));
 filteredFeatureCollection.features = filteredFeatureCollection.features.filter(function(feature) {
   return feature.properties.z !== 'C'
 });
 
-const finalFilesize = JSON.stringify(featureCollection).length;
-const filteredFileSize = JSON.stringify(filteredFeatureCollection).length;
 
 await mkdir('./dist/data', { recursive: true })
 await writeFile(`./dist/${dataFiles.dest}`, JSON.stringify(featureCollection), 'utf8')
 await writeFile(`./dist/${dataFiles.destLight}`, JSON.stringify(filteredFeatureCollection), 'utf8')
 
-console.log(`\nOriginal file:\t${originalFilesize / 1e6} Mo\t${dataFiles.original}`)
-console.log(`Optimized file:\t${finalFilesize / 1e6} Mo\tdist/${dataFiles.dest}`)
-console.log(`Filtered file:\t${filteredFileSize / 1e6} Mo\tdist/${dataFiles.destLight}`)
+log(`\nOriginal file:\t${originalFilesize / 1e6} Mo\t${dataFiles.original}`)
+log(`Optimized file:\t${JSON.stringify(featureCollection).length / 1e6} Mo\tdist/${dataFiles.dest}`)
+log(`Filtered file:\t${JSON.stringify(filteredFeatureCollection).length / 1e6} Mo\tdist/${dataFiles.destLight}`)
 
-console.log('\nBye!')
+log('\nDone!')
