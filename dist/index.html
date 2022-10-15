@@ -28,13 +28,13 @@
         <input class="search-input"
                aria-label="Search"
                v-model="searchQuery"
-               @input="setTyping()"
-               @focusin="setTyping()"
-               @compositionupdate="setTyping()"
-               @keyup.esc="clearSearch()"
+               @input="setTyping"
+               @focusin="setTyping"
+               @compositionupdate="setTyping"
+               @keyup.esc="clearSearch"
                type="text"
                placeholder="Commune, code postal...">
-        <button v-show="searchQuery.length" @click="clearSearch()"
+        <button v-show="searchQuery.length" @click="clearSearch"
                 type="button" class="clear-btn" title="Effacer">
           &times;
         </button>

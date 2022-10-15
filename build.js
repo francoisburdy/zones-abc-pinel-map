@@ -1,22 +1,22 @@
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises'
 import { dataFiles } from './vars.js'
 
-const log = console.log;
+const log = console.log
 
 const roundCoordinates = (latLng, precision = 1e3) => {
   latLng[0] = Math.round((latLng[0] + Number.EPSILON) * precision) / precision
   latLng[1] = Math.round((latLng[1] + Number.EPSILON) * precision) / precision
 }
 
-let featureCollection = JSON.parse(await readFile(dataFiles.original, "utf8"))
+const featureCollection = JSON.parse(await readFile(dataFiles.original, 'utf8'))
 log(`Commune Geojson file ${dataFiles.original} loaded`)
 
-let parsedZones = JSON.parse(await readFile(dataFiles.zoneMapping, "utf8"))
+const parsedZones = JSON.parse(await readFile(dataFiles.zoneMapping, 'utf8'))
 log(`Zone mapping file ${dataFiles.zoneMapping} loaded`)
 
 let countFound = 0
 
-const originalFilesize = JSON.stringify(featureCollection).length;
+const originalFilesize = JSON.stringify(featureCollection).length
 
 for (const feature of featureCollection.features) {
   const zone = parsedZones[feature.properties.com_code]
@@ -48,13 +48,12 @@ for (const feature of featureCollection.features) {
   }
 }
 
-log(countFound, `features enriched\t`, featureCollection.features.length - countFound, `not found`)
+log(countFound, 'features enriched\t', featureCollection.features.length - countFound, 'not found')
 
-const filteredFeatureCollection = JSON.parse(JSON.stringify(featureCollection));
+const filteredFeatureCollection = JSON.parse(JSON.stringify(featureCollection))
 filteredFeatureCollection.features = filteredFeatureCollection.features.filter(function(feature) {
   return feature.properties.z !== 'C'
-});
-
+})
 
 await mkdir('./dist/data', { recursive: true })
 await writeFile(`./dist/${dataFiles.dest}`, JSON.stringify(featureCollection), 'utf8')

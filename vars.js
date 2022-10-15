@@ -20,30 +20,30 @@ const mapConfig = {
 }
 
 const itemsColors = {
-  'Abis': {
-    'text': 'Zone A bis',
-    'color': '#9800e7',
-    'hoverColor': '#8300c4',
+  Abis: {
+    text: 'Zone A bis',
+    color: '#9800e7',
+    hoverColor: '#8300c4',
   },
-  'A': {
-    'text': 'Zone A',
-    'color': '#f10000',
-    'hoverColor': '#d00000',
+  A: {
+    text: 'Zone A',
+    color: '#f10000',
+    hoverColor: '#d00000',
   },
-  'B1': {
-    'text': 'Zone B1',
-    'color': '#ffa600',
-    'hoverColor': '#d48b00',
+  B1: {
+    text: 'Zone B1',
+    color: '#ffa600',
+    hoverColor: '#d48b00',
   },
-  'B2': {
-    'text': 'Zone B2',
-    'color': '#abe300',
-    'hoverColor': '#96c700',
+  B2: {
+    text: 'Zone B2',
+    color: '#abe300',
+    hoverColor: '#96c700',
   },
-  'C': {
-    'text': 'Zone C',
-    'color': 'transparent',
-    'hoverColor': '#ccc',
+  C: {
+    text: 'Zone C',
+    color: 'transparent',
+    hoverColor: '#ccc',
   },
 }
 

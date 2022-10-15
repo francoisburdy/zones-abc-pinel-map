@@ -1,20 +1,19 @@
-import { apiAdresseUrl, dataFiles, itemsColors, mapboxToken, mapConfig } from "../vars.js"
+import { apiAdresseUrl, dataFiles, itemsColors, mapboxToken, mapConfig } from '../vars.js'
 import mapboxgl from 'mapbox-gl'
 import { createApp } from 'vue'
 import axios from 'axios'
 
 import '../favicon.png'
 
-mapboxgl.accessToken = mapboxToken;
-
-const layerId = 'communes-layer'
-const sourceId = 'communes'
+mapboxgl.accessToken = mapboxToken
 
 createApp({
-  data() {
+  data () {
     return {
       legendItems: itemsColors,
-      searchQuery: "",
+      communesLayerId: 'communesLayer',
+      communesSourceId: 'communesSource',
+      searchQuery: '',
       isTyping: false,
       searchResults: [],
       hasResults: false,
@@ -28,13 +27,13 @@ createApp({
       lightMode: true,
     }
   },
-  mounted() {
-    this.timing = performance.now();
-    this.initMap();
+  mounted () {
+    this.timing = performance.now()
+    this.initMap()
   },
   methods: {
-    initMap() {
-      this.map = new mapboxgl.Map(mapConfig);
+    initMap () {
+      this.map = new mapboxgl.Map(mapConfig)
       this.map
         .addControl(new mapboxgl.AttributionControl({
           customAttribution: `par François Burdy &bull; 
@@ -42,73 +41,73 @@ createApp({
         }))
         .addControl(new mapboxgl.NavigationControl(), 'bottom-right')
         .addControl(new mapboxgl.FullscreenControl({
-          container: document.querySelector('body')
+          container: document.querySelector('body'),
         }), 'bottom-right')
-      ;
+
       this.map
         .on('style.load', () => {
-          this.map.setFog({});
+          this.map.setFog({})
         })
         .on('load', this.loadFeatures)
-        .on('click', 'communes-layer', (e) => {
-          this.showMarker(e.lngLat, e.features[0]);
+        .on('click', this.communesLayerId, (e) => {
+          this.showMarker(e.lngLat, e.features[0])
         })
-        .on('mousemove', 'communes-layer', (e) => {
+        .on('mousemove', this.communesLayerId, (e) => {
           if (e.features.length > 0) {
             if (this.hoveredCommuneId !== null) {
               this.map.setFeatureState(
-                { source: 'communes', id: this.hoveredCommuneId },
-                { hover: false }
-              );
+                { source: this.communesSourceId, id: this.hoveredCommuneId },
+                { hover: false },
+              )
             }
-            this.hoveredCommuneId = e.features[0].id;
+            this.hoveredCommuneId = e.features[0].id
             this.map.setFeatureState(
-              { source: 'communes', id: this.hoveredCommuneId },
-              { hover: true }
-            );
+              { source: this.communesSourceId, id: this.hoveredCommuneId },
+              { hover: true },
+            )
           }
         })
-        .on('mouseenter', 'communes-layer', () => {
-          this.map.getCanvas().style.cursor = 'pointer';
+        .on('mouseenter', this.communesLayerId, () => {
+          this.map.getCanvas().style.cursor = 'pointer'
         })
-        .on('mouseleave', 'communes-layer', () => {
-          this.map.getCanvas().style.cursor = '';
+        .on('mouseleave', this.communesLayerId, () => {
+          this.map.getCanvas().style.cursor = ''
           if (this.hoveredCommuneId !== null) {
             this.map.setFeatureState(
-              { source: 'communes', id: this.hoveredCommuneId },
-              { hover: false }
-            );
+              { source: this.communesSourceId, id: this.hoveredCommuneId },
+              { hover: false },
+            )
           }
-          this.hoveredCommuneId = null;
+          this.hoveredCommuneId = null
         })
         .on('idle', () => {
           if (this.showLoader) {
-            console.log('idle in ', (performance.now() - this.timing) + 'ms');
-            this.showLoader = false;
+            console.log('idle in ', (performance.now() - this.timing) + 'ms')
+            this.showLoader = false
           }
-        });
+        })
     },
 
-    loadFeatures() {
-      console.log('load in ', (performance.now() - this.timing) + 'ms');
-      if (this.map.getLayer('communes-layer')) {
-        this.map.removeLayer('communes-layer')
+    loadFeatures () {
+      console.log('load in ', (performance.now() - this.timing) + 'ms')
+      if (this.map.getLayer(this.communesLayerId)) {
+        this.map.removeLayer(this.communesLayerId)
       }
-      if (this.map.getSource('communes')) {
-        this.map.removeSource('communes')
+      if (this.map.getSource(this.communesSourceId)) {
+        this.map.removeSource(this.communesSourceId)
       }
-      this.map.addSource('communes', {
+      this.map.addSource(this.communesSourceId, {
         type: 'geojson',
         data: this.lightMode ? dataFiles.destLight : dataFiles.dest,
         buffer: 0,
         tolerance: 0.45,
         generateId: true,
-      });
-      this.map.addLayer(this.communeLayer);
+      })
+      this.map.addLayer(this.communeLayer)
     },
 
-    showMarker(lnglat, feature) {
-      const props = feature.properties;
+    showMarker (lnglat, feature) {
+      const props = feature.properties
       new mapboxgl.Popup()
         .setLngLat(lnglat)
         .setHTML(
@@ -117,81 +116,81 @@ createApp({
            <span class="zone-badge zone-${props.z.toLowerCase()}">Zone ${props.z}</span><br/>
            Code INSEE ${props.cc}`
         )
-        .addTo(this.map);
+        .addTo(this.map)
     },
 
-    switchMode() {
+    switchMode () {
       this.showLoader = true
       this.lightMode = !this.lightMode
       this.loadFeatures()
     },
 
-    setTyping() {
+    setTyping () {
       this.showAboutBox = false
-      this.isTyping = true;
-      clearInterval(this.intervalSearch);
+      this.isTyping = true
+      clearInterval(this.intervalSearch)
       this.intervalSearch = setTimeout(() => {
-        this.search();
+        this.search()
       }, 350)
     },
 
-    search() {
+    search () {
       console.log('search...', this.searchQuery)
       this.isTyping = false
       if (this.searchQuery.length >= 3) {
-        this.isLoading = true;
+        this.isLoading = true
         axios.get(`${apiAdresseUrl}&q=${this.searchQuery}`)
           .then(response => {
-            this.isLoading = false;
-            this.searchResults = response.data.features;
-            this.hasSearchResults();
+            this.isLoading = false
+            this.searchResults = response.data.features
+            this.hasSearchResults()
           })
           .catch(thrown => {
-            this.isLoading = false;
-            console.error(thrown);
-          });
+            this.isLoading = false
+            console.error(thrown)
+          })
       } else {
-        this.searchResults = [];
-        this.hasSearchResults();
+        this.searchResults = []
+        this.hasSearchResults()
       }
     },
 
-    hasSearchResults() {
-      this.hasResults = this.searchResults && this.searchResults.length;
+    hasSearchResults () {
+      this.hasResults = this.searchResults && this.searchResults.length
     },
 
-    addressChange() {
-      this.moveToAddress();
-      this.clearSearch();
-      this.searchQuery = this.chosenAddress.properties.label;
+    addressChange () {
+      this.moveToAddress()
+      this.clearSearch()
+      this.searchQuery = this.chosenAddress.properties.label
     },
 
-    clearSearch() {
-      this.searchQuery = '';
-      this.searchResults = null;
+    clearSearch () {
+      this.searchQuery = ''
+      this.searchResults = null
     },
 
-    moveToAddress() {
-      let coordinates = this.chosenAddress.geometry.coordinates;
+    moveToAddress () {
+      const coordinates = this.chosenAddress.geometry.coordinates
       this.map.flyTo({
         center: [coordinates[0], coordinates[1]],
         zoom: 9.7,
         essential: true,
-      });
+      })
       this.map.once('moveend', () => {
-        let center = this.map.getCenter();
+        const center = this.map.getCenter()
         this.map.fire('click', { lngLat: center, point: this.map.project(center) })
       })
     },
   },
   computed: {
-    communeLayer() {
+    communeLayer () {
       return {
-        'id': 'communes-layer',
-        'type': 'fill',
-        'source': 'communes',
-        'layout': {},
-        'paint': {
+        id: this.communesLayerId,
+        type: 'fill',
+        source: this.communesSourceId,
+        layout: {},
+        paint: {
           'fill-color': [
             'match', ['get', 'z'],
             'Abis', [
@@ -223,21 +222,20 @@ createApp({
               ['boolean', ['feature-state', 'hover'], false],
               this.legendItems.C.hoverColor,
               this.legendItems.C.color,
-            ]
+            ],
           ],
           'fill-opacity': 0.68,
           'fill-outline-color':
             [
               'match', ['get', 'z'],
               'C',
-              "rgba(0, 0, 0, 10%)",
-              "rgba(0, 0, 0, 20%)"
+              'rgba(0, 0, 0, 10%)',
+              'rgba(0, 0, 0, 20%)',
             ],
 
-        }
+        },
       }
     },
-  }
+  },
 
 }).mount('#app')
-
