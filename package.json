@@ -10,11 +10,12 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "build": "node ./src/build.js",
     "dev": "webpack --mode=development",
     "prod": "webpack --mode=production",
     "watch": "webpack --watch --mode=development",
     "watch-prod": "webpack --watch --mode=production",
-    "deploy": "rm -r ./dist/* && node build && yarn prod && git subtree push --prefix dist origin gh-pages"
+    "deploy": "rm -r ./dist/* && yarn build && yarn prod && git subtree push --prefix dist origin gh-pages"
   },
   "dependencies": {
     "axios": "^1.1.2",

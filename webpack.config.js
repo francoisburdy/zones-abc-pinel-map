@@ -8,7 +8,7 @@ export default {
   entry: [
     './src/app.js',
     './src/app.sass',
-    './index.html',
+    './src/index.html',
   ],
   output: {
     filename: 'app.js',
@@ -39,8 +39,8 @@ export default {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
-        generator : {
-          filename : '[name][ext]',
+        generator: {
+          filename: '[name][ext]',
         }
       },
     ],

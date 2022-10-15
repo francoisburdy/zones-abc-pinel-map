@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'fs/promises'
-import { dataFiles } from './vars.js'
+import { dataFiles } from '../vars.js'
 
 const log = console.log
 

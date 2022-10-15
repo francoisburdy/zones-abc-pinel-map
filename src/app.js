@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl'
 import { createApp } from 'vue'
 import axios from 'axios'
 
-import '../favicon.png'
+import '../res/favicon.png'
 
 mapboxgl.accessToken = mapboxToken
 
