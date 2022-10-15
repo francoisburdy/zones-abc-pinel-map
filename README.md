@@ -3,7 +3,7 @@ Carte de visualisation du zonage A, B, C
 
 [Voir la carte / Live demo](https://francoisburdy.github.io/zones-abc-pinel-map/)
 
-![Screenshot](https://github.com/francoisburdy/zones-abc-pinel-map/blob/main/screenshot.png?raw=true)
+![Screenshot](https://github.com/francoisburdy/zones-abc-pinel-map/blob/main/res/screenshot.png?raw=true)
 
 ### Zones tendues ABC par commune
 
